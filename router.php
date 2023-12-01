@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1); 
+ini_set('display_startup_errors', 1); 
+error_reporting(E_ALL);
+
 
 class Router {
     // This array will store all the routes
@@ -12,24 +16,19 @@ class Router {
 
     // This function matches the current request to a route
     public function matchRoute() {
-        // Get the HTTP method and URL from the server superglobal
         $method = $_SERVER['REQUEST_METHOD'];
         $url = $_SERVER['REQUEST_URI'];
-
-        // Check if there are any routes for this HTTP method
         if (isset($this->routes[$method])) {
-            // Loop through all the routes for this HTTP method
             foreach ($this->routes[$method] as $routeUrl => $target) {
-                // If the current route URL matches the requested URL
-                if ($routeUrl === $url) {
-                    // Call the target function for this route
-                    call_user_func($target);
-                    // Stop processing further
+                // Use named subpatterns in the regular expression pattern to capture each parameter value separately
+                $pattern = preg_replace('/\/:([^\/]+)/', '/(?P<$1>[^/]+)', $routeUrl);
+                if (preg_match('#^' . $pattern . '$#', $url, $matches)) {
+                    // Pass the captured parameter values as named arguments to the target function
+                    $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY); // Only keep named subpattern matches
+                    call_user_func_array($target, $params);
                     return;
                 }
             }
         }
-        // If no matching route was found, throw an exception
         throw new Exception('Route not found');
-    }
-}
+    }}
