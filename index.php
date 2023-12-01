@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1); 
-ini_set('display_startup_errors', 1); 
-error_reporting(E_ALL);
 // Include the Router class from router.php
 include_once "router.php";
 // Create a new instance of the Router class
@@ -10,12 +7,13 @@ $router = new Router();
 // This route matches GET requests to the /blogs URL
 // When this route is matched, it will echo a message and then exit
 $router->addRoute('GET', '/blogs', function () {
-    echo "My route is working!";
+   include 'blogs.php';
     exit;
 });
-$router->addRoute('GET', '/hello', function () {
-    echo "My route hello is working!";
-    exit;
+
+//added homepage route
+$router->addRoute('GET', '/', function () {
+    include 'home.php';
 });
 
 // Try to match the current request to a route
